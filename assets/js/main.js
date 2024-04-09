@@ -62,15 +62,19 @@ async function UnlimitedPostPluginInitLoadMore() {
         console.log('End of list, button is disabled')
         return
     }
-    if(buttonString.loading){
+    if(buttonString.loading === '1'){
         console.log(' button is loading')
         return
     }
-    buttonElement.dataset.loading = true
+    buttonElement.dataset.loading = '1'
     buttonElement.textContent = 'fetching...'
     // Example usage:
     UnlimitedPostPluginretrieveWordPressPosts({ page:  buttonString.page, perPage: 12 })
         .then(posts => {
+            if(!posts ){
+                UnlimitedPostPluginPostDeactivateButton();
+                return;
+                    }
             buttonElement.dataset.loading = false
             buttonElement.textContent = 'Load more'
             if (posts) {
@@ -98,15 +102,15 @@ async function UnlimitedPostPluginInitLoadMore() {
             }
         })
         .catch(error => {
-            buttonElement.dataset.loading = false
+            buttonElement.dataset.loading = '0'
             buttonElement.textContent = 'Load more'
-            console.log({buttonString})
+ 
             if(buttonString.page > 2 ){
         UnlimitedPostPluginPostDeactivateButton();
             }
             console.error('Error:', error);
         }).finally(() => {
-    buttonElement.dataset.loading = false
+    buttonElement.dataset.loading = '0'
     buttonElement.textContent = 'Load more'
 
         });
@@ -177,16 +181,6 @@ function UnlimitedPostPluginPostCardSkeleton(post) {
     return wrapper;
 
 }
-console.log('[ v1.0.2 ]', 'UnlimitedPostPluginInitLoadMore');
+console.log('[ v1.0.3 ]', 'UnlimitedPostPluginInitLoadMore');
 
 document.addEventListener('DOMContentLoaded', UnlimitedPostPluginInit)
-
-// <div class="listing-item">
-//     <a class="image" href="https://creatiosoftweb.pokermoogley.com/blogs/how-does-pokernow-club-work-and-how-can-creatiosoft-assist-you-in-creating-something-similar/">
-//         <img width="300" height="150" src="https://creatiosoftweb.pokermoogley.com/blogs/wp-content/uploads/2024/02/How-to-moneitize-your-mobile-gane-54.png" class="attachment-medium size-medium wp-post-image" alt="" decoding="async">
-//     </a> 
-//     <a class="title" style="min-height:180px" href="https://creatiosoftweb.pokermoogley.com/blogs/how-does-pokernow-club-work-and-how-can-creatiosoft-assist-you-in-creating-something-similar/">How does Pokernow Club work and how can Creatiosoft assist you in creating something similar?</a> 
-//     <div class="date" style="position:relative;">
-//     <span style="position:absolute;bottom:18px;">February 5, 2024</span>
-//     </div>
-// </div>
