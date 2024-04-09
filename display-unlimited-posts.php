@@ -42,7 +42,7 @@ function unlimited_posts_display_posts_shortcode($atts)
             'post_status'           => 'publish',
             'post_type'             => 'post',
             'posts_per_page'        => '12',
-            'meta_key'              =>  "_thumbnail_id"
+            // 'meta_key'              =>  "_thumbnail_id"
         ),
         $atts,
         'display-unlimited-posts'

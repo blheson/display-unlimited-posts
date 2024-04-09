@@ -55,11 +55,18 @@
   }
   @media screen and (max-width: 480px) {
     #unlimited_posts_display_posts_shortcode .unlimited_posts-post-card{
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(1, 1fr);
 
     }
     #unlimited_posts_display_posts_shortcode .listing-item{
-        width: 177px;
+        width: 100%;
         margin: 4px;
     }
+    #unlimited_posts_display_posts_shortcode .unlimited-post-listing-item-title{
+      font-size: 14px;
+    }
+    .unlimited-post-image_link img{
+      width: 100%;
+    }
   }
+  
