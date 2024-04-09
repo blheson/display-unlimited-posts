@@ -71,6 +71,8 @@ async function UnlimitedPostPluginInitLoadMore() {
     // Example usage:
     UnlimitedPostPluginretrieveWordPressPosts({ page:  buttonString.page, perPage: 12 })
         .then(posts => {
+            buttonElement.dataset.loading = false
+            buttonElement.textContent = 'Load more'
             if (posts) {
                 // Handle retrieved posts
              
@@ -96,6 +98,8 @@ async function UnlimitedPostPluginInitLoadMore() {
             }
         })
         .catch(error => {
+            buttonElement.dataset.loading = false
+            buttonElement.textContent = 'Load more'
             console.log({buttonString})
             if(buttonString.page > 2 ){
         UnlimitedPostPluginPostDeactivateButton();
@@ -173,7 +177,7 @@ function UnlimitedPostPluginPostCardSkeleton(post) {
     return wrapper;
 
 }
-console.log('[ v1.0.1 ]', 'UnlimitedPostPluginInitLoadMore');
+console.log('[ v1.0.2 ]', 'UnlimitedPostPluginInitLoadMore');
 
 document.addEventListener('DOMContentLoaded', UnlimitedPostPluginInit)
 

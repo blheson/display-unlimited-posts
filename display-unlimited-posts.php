@@ -4,9 +4,9 @@
  * Plugin Name: Display Unlimited Posts
  * Plugin URI: https://blessingudor.com
  * Description: Display a listing of posts using the [display-posts] shortcode
- * Version: 1.0.0
- * Author: Bill Erickson
- * Author URI: https://www.billerickson.net
+ * Version: 1.0.1
+ * Author: Blessing Udor
+ * Author URI: https://blessingudor.com
  *
  * This program is free software; you can redistribute it and/or modify it under the terms of the GNU
  * General Public License version 2, as published by the Free Software Foundation.  You may NOT assume
@@ -16,7 +16,7 @@
  * even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.
  *
  * @package Display Unlimited Posts
- * @version 1.0.0
+ * @version 1.0.1
  * @author Blessing udor <reachme@blessingudor.com>
  * @copyright Copyright (c) 2024, Blessing udor <reachme@blessingudor.com>
  * @link https://blessingudor.com
@@ -84,7 +84,7 @@ function unlimited_posts_display_posts_shortcode($atts)
 function  unlimited_posts_enqueue_custom_script()
 {
     // Enqueue the custom script with a unique handle
-    wp_enqueue_script('unlimited_posts_enqueue_custom_script-custom-script', plugins_url('display-unlimited-posts/assets/js/main.js'), array(), '1.0.1', true);
+    wp_enqueue_script('unlimited_posts_enqueue_custom_script-custom-script', plugins_url('display-unlimited-posts/assets/js/main.js'), array(), '1.0.2', true);
 }
 add_action('wp_enqueue_scripts', 'unlimited_posts_enqueue_custom_script');
 // Enqueue stylesheet function
