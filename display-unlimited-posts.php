@@ -4,7 +4,7 @@
  * Plugin Name: Display Unlimited Posts
  * Plugin URI: https://blessingudor.com
  * Description: Display a listing of posts using the [display-posts] shortcode
- * Version: 1.0.1
+ * Version: 1.0.2
  * Author: Blessing Udor
  * Author URI: https://blessingudor.com
  *
@@ -42,6 +42,7 @@ function unlimited_posts_display_posts_shortcode($atts)
             'post_status'           => 'publish',
             'post_type'             => 'post',
             'posts_per_page'        => '12',
+            'cat'        => false,
             // 'meta_key'              =>  "_thumbnail_id"
         ),
         $atts,
@@ -52,6 +53,7 @@ function unlimited_posts_display_posts_shortcode($atts)
     global $dup_listing;
 
     $dup_listing = new WP_Query($atts);
+    $disable = $dup_listing->post_count < $atts['posts_per_page'];
     while ($dup_listing->have_posts()) :
         $dup_listing->the_post();
         global $post;
@@ -59,7 +61,7 @@ function unlimited_posts_display_posts_shortcode($atts)
         $body .=  '<div class="listing-item">';
         //image
 
-        $body .= '<a class="unlimited-post-image_link" href="' . get_permalink() . '">' . get_the_post_thumbnail(get_the_ID(), 'medium') . '</a> ';
+        $body .= '<a class="unlimited-post-image_link" href="' . get_permalink() . '">' . get_the_post_thumbnail(get_the_ID(), 'thumbnail') . '</a> ';
         //end of image
 
         //start of title
@@ -76,7 +78,11 @@ function unlimited_posts_display_posts_shortcode($atts)
     endwhile;
     wp_reset_postdata();
     $body .=  '</div>'; //end of class unlimited_posts-post-card
-    $body .= '<div class="unlimited-posts-button-wrapper"><button data-page="2" data-per_page="' . $atts['posts_per_page'] . '" data-post_type="' . $atts['post_type'] . '"  data-post_status="' . $atts['post_status'] . '" data-post_status="' . $atts['post_status'] . '" data-order="' . $atts['order'] . '" data-orderby="' . $atts['orderby'] . '" data-metakey="' . $atts['meta_key'] . '" onclick="UnlimitedPostPluginInitLoadMore()">Load more</button></div>';
+    $body .= '<div class="unlimited-posts-button-wrapper"><button data-page="2" data-per_page="' . $atts['posts_per_page'] . '" data-post_type="' . $atts['post_type'] . '"  data-post_status="' . $atts['post_status'] . '" data-post_status="' . $atts['post_status'] . '" data-order="' . $atts['order'] . '" data-orderby="' . $atts['orderby'] . '"';
+    if($disable){
+        $body .= 'data-disabled="1"';
+    }
+    $body .= 'data-cat="' . $atts['cat'] . '" onclick="UnlimitedPostPluginInitLoadMore()">Load more</button></div>';
     $body .=  '</div>';
 
     return $body;
@@ -84,14 +90,14 @@ function unlimited_posts_display_posts_shortcode($atts)
 function  unlimited_posts_enqueue_custom_script()
 {
     // Enqueue the custom script with a unique handle
-    wp_enqueue_script('unlimited_posts_enqueue_custom_script-custom-script', plugins_url('display-unlimited-posts/assets/js/main.js'), array(), '1.0.2', true);
+    wp_enqueue_script('unlimited_posts_enqueue_custom_script-custom-script', plugins_url('display-unlimited-posts/assets/js/main.js'), array(), '1.0.3', true);
 }
 add_action('wp_enqueue_scripts', 'unlimited_posts_enqueue_custom_script');
 // Enqueue stylesheet function
 function unlimited_posts_enqueue_custom_style()
 {
     // Enqueue the custom stylesheet with a unique handle
-    wp_enqueue_style('unlimited_posts_enqueue_custom_script-custom-style', plugins_url('display-unlimited-posts/assets/css/main.css'), array(), '1.0', 'all');
+    wp_enqueue_style('unlimited_posts_enqueue_custom_script-custom-style', plugins_url('display-unlimited-posts/assets/css/main.css'), array(), '1.0.1', 'all');
 }
 add_action('wp_enqueue_scripts', 'unlimited_posts_enqueue_custom_style');
 
@@ -115,7 +121,7 @@ function unlimited_posts_ws_register_images_field()
 function unlimited_posts_ws_get_images_urls($object, $field_name, $request)
 {
 
-    $medium = wp_get_attachment_image_src(get_post_thumbnail_id($object['id']), 'medium');
+    $medium = wp_get_attachment_image_src(get_post_thumbnail_id($object['id']), 'thumbnail');
     if (is_array($medium)) {
         return isset($medium['0']) ? $medium['0'] : '';
     }
