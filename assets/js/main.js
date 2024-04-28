@@ -1,11 +1,11 @@
 // Function to retrieve WordPress posts
-async function UnlimitedPostPluginretrieveWordPressPosts({ page = 1, perPage = 15, searchQuery = '', postType = 'post', orderBy = 'date', order = 'desc' }) {
-    if(page< 2){
+async function UnlimitedPostPluginretrieveWordPressPosts({ page = 1, perPage = 15, cat = false, searchQuery = '', postType = 'post', orderBy = 'date', order = 'desc' }) {
+    if (page < 2) {
         console.log('[ UnlimitedPostPluginretrieveWordPressPosts ] Invalid error Posts')
         return;
     }
     // Define the base URL of the WordPress site and the endpoint for posts
-    var isBlog = window.location.href.includes('blog')?'/blogs':''
+    var isBlog = window.location.href.includes('blog') ? '/blogs' : ''
     var baseURL = `${window.location.origin}${isBlog}/wp-json/wp/v2/posts`;
 
     // varruct the query string with optional parameters
@@ -13,6 +13,10 @@ async function UnlimitedPostPluginretrieveWordPressPosts({ page = 1, perPage = 1
     let queryParams = `?page=${page}&per_page=${perPage}&type=${postType}&orderby=${orderBy}&order=${order}`;
     if (searchQuery !== '') {
         queryParams += `&search=${encodeURIComponent(searchQuery)}`;
+    }
+    if(cat){
+        queryParams += `&categories=${cat}`;
+
     }
 
     // varruct the complete URL
@@ -49,6 +53,9 @@ async function UnlimitedPostPluginInit() {
         setTimeout(UnlimitedPostPluginInit, 1000)
         return
     }
+    if(buttonElement.dataset.disabled){
+        UnlimitedPostPluginPostDeactivateButton();
+    }
 
 
 
@@ -58,63 +65,68 @@ async function UnlimitedPostPluginInitLoadMore() {
     var buttonElement = document.querySelector('#unlimited_posts_display_posts_shortcode button');
 
     var buttonString = buttonElement.dataset;
-    
-    if(buttonString.disabled){
+
+    if (buttonString.disabled) {
         console.log('End of list, button is disabled')
         return
     }
-    if(buttonString.loading === '1'){
+    if (buttonString.loading === '1') {
         console.log(' button is loading')
         return
     }
     buttonElement.dataset.loading = '1'
     buttonElement.textContent = 'fetching...'
     // Example usage:
-    UnlimitedPostPluginretrieveWordPressPosts({ page:  buttonString.page, perPage: 12 })
+    UnlimitedPostPluginretrieveWordPressPosts({
+        page: buttonString.page,
+        perPage: 12,
+        ...(buttonString.cat && buttonString.cat !== 'false' && 
+        { cat: buttonString.cat })
+    })
         .then(posts => {
-            if(!posts ){
-                UnlimitedPostPluginPostDeactivateButton();
-                return;
-                    }
-            buttonElement.dataset.loading = false
-            buttonElement.textContent = 'Load more'
-            if (posts) {
-                // Handle retrieved posts
-             
-                var template = document.createDocumentFragment();
-                if (Array.isArray(posts)) {
-             
-                    if(posts.length < buttonString.per_page) {
-                        UnlimitedPostPluginPostDeactivateButton();
-                    }
-                    posts.forEach(post => {
-                        var postcard = UnlimitedPostPluginPostCardSkeleton(post);
+        if (!posts) {
+            UnlimitedPostPluginPostDeactivateButton();
+            return;
+        }
+        buttonElement.dataset.loading = false
+        buttonElement.textContent = 'Load more'
+        if (posts) {
+            // Handle retrieved posts
 
-                        template.appendChild(postcard)
-                    })
-                    var arrayCardElement = document.querySelector('#unlimited_posts_display_posts_shortcode .unlimited_posts-post-card');
+            var template = document.createDocumentFragment();
+            if (Array.isArray(posts)) {
 
-                    arrayCardElement.appendChild(template);
-                    buttonElement.dataset.page = Number(buttonString.page) + 1
+                if (posts.length < buttonString.per_page) {
+                    UnlimitedPostPluginPostDeactivateButton();
                 }
-            } else {
-                // Handle case where posts couldn't be retrieved
-                console.log('Failed to retrieve WordPress posts.');
-            }
-        })
-        .catch(error => {
-            buttonElement.dataset.loading = '0'
-            buttonElement.textContent = 'Load more'
- 
-            if(buttonString.page > 2 ){
-        UnlimitedPostPluginPostDeactivateButton();
-            }
-            console.error('Error:', error);
-        }).finally(() => {
-    buttonElement.dataset.loading = '0'
-    buttonElement.textContent = 'Load more'
+                posts.forEach(post => {
+                    var postcard = UnlimitedPostPluginPostCardSkeleton(post);
 
-        });
+                    template.appendChild(postcard)
+                })
+                var arrayCardElement = document.querySelector('#unlimited_posts_display_posts_shortcode .unlimited_posts-post-card');
+
+                arrayCardElement.appendChild(template);
+                buttonElement.dataset.page = Number(buttonString.page) + 1
+            }
+        } else {
+            // Handle case where posts couldn't be retrieved
+            console.log('Failed to retrieve WordPress posts.');
+        }
+    })
+    .catch(error => {
+        buttonElement.dataset.loading = '0'
+        buttonElement.textContent = 'Load more'
+
+        if (buttonString.page > 2) {
+            UnlimitedPostPluginPostDeactivateButton();
+        }
+        console.error('Error:', error);
+    }).finally(() => {
+        buttonElement.dataset.loading = '0'
+        buttonElement.textContent = 'Load more'
+
+    });
 
 }
 
@@ -182,6 +194,6 @@ function UnlimitedPostPluginPostCardSkeleton(post) {
     return wrapper;
 
 }
-console.log('[ v1.0.4 ]', 'UnlimitedPostPluginInitLoadMore');
+console.log('[ v1.0.5 ]', 'UnlimitedPostPluginInitLoadMore');
 
 document.addEventListener('DOMContentLoaded', UnlimitedPostPluginInit)
